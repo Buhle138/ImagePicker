@@ -22,8 +22,25 @@ struct ContentView: View {
                     .resizable()
             }
             Spacer()
-            PhotosPicker(selection: $selected, matching: .images) {
+            PhotosPicker(selection: $selected, maxSelectionCount: 1, matching: .images) {
                Text("Pick Photo")
+            }
+            .onChange(of: selected) { newValue in
+                guard let item = selected.first else{
+                    return
+                }
+                item.loadTransferable(type: Data.self) { result in
+                    switch result {
+                    case.success(let data):
+                        if let data = data {
+                            self.data = data
+                        }else{
+                            print("Data is nil")
+                        }
+                    case .failure(let failure):
+                       fatalError("\(failure)")
+                    }
+                }
             }
         }
     }
